@@ -3,7 +3,7 @@
 #include <cctype>   
 
 #include "lexer.hpp"
-//test
+//tes
 Lexer::Lexer(const std::string& input) {
     text = input;
     pos = 0;

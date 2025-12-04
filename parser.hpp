@@ -15,8 +15,8 @@ private:
     token advance();
     bool is_match(token_type type);
     bool is_end();
-    void expr();
-    void term();
-    void factor();
+    token expr();
+    token term();
+    token factor();
 
 };

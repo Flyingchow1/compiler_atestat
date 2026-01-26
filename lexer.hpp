@@ -1,5 +1,6 @@
 #include <string>
 #include <cctype>
+#include <iostream>
 #pragma once
 enum token_type{
     NUM,
@@ -9,6 +10,7 @@ enum token_type{
     SLASH,
     LPAR,
     RPAR,
+    TIMES,
     END_OF_FILE
 };
 struct token {

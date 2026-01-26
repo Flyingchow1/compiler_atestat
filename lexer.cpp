@@ -1,9 +1,6 @@
-#include <iostream>
-#include <string>
-#include <cctype>   
 
 #include "lexer.hpp"
-//tes
+
 Lexer::Lexer(const std::string& input) {
     text = input;
     pos = 0;
@@ -93,6 +90,13 @@ token Lexer::getToken(){
         advance();
         return result;
     }
+    else if(current=='*'){
+        token result;
+        result.type=TIMES;
+        result.value = std::string(1, current);
+        advance();
+        return result;
+    }
     else if(current=='\0'){
         token result;
         result.type=END_OF_FILE;
@@ -113,9 +117,10 @@ std::string Lexer::token_to_string(token_type type){
     else if(type == 4) return "SLASH";
     else if(type == 5) return "LPAR";
     else if(type == 6) return "RPAR";
-    else if(type == 7) return "EOF";
+    else if(type == 7) return "TIMES";
+    else if(type == 8) return "EOF";
     else {
-        std::cerr << "eroare???"<<std::endl;
+        std::cerr << "eroare???"<<type<<std::endl;
         return "END_OF_FILE";
     }
 }

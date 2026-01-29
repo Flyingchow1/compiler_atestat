@@ -11,7 +11,8 @@ enum token_type{
     LPAR,
     RPAR,
     TIMES,
-    END_OF_FILE
+    END_OF_FILE,
+    END_OF_LINE
 };
 struct token {
     token_type type;

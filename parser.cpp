@@ -71,9 +71,14 @@ token Parser::previous(){
 
 
 /*
+program → line* EOF
+
+line → declaration EOL| expr EOL
+declaration → IDENT "=" expr   // decided by lookahead in parser
 expr   → term ((+ | -) term)*
 term   → factor ((* | /) factor)*
-factor → NUMBER | "(" expr ")" | "-" factor
+
+factor → NUMBER| IDENT| "(" expr ")"| "-" factor
 */
 
 ///ACTUAL PARSING

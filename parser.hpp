@@ -5,8 +5,12 @@
 struct Node {
     virtual ~Node() = default;//virtual ca sa se stearga calumea node urile
 };
+struct ExprNode:Node{
+    virtual ~ExprNode()=default;
 
-struct NumberNode:Node {
+};
+
+struct NumberNode:ExprNode {
     int value;                // the numeric value
     NumberNode(int v) : value(v) {}  ;// constructor to set the value
     /*
@@ -16,22 +20,35 @@ struct NumberNode:Node {
     }
     */
 };
-struct VariableNode:Node{
+struct VariableNode:ExprNode{
     std::string name;
     VariableNode(const std::string& n) : name(n){};
 };
-struct UnaryNode:Node {//asa e numele ca se refera la un operatr unu singur unary
+struct UnaryNode:ExprNode {//asa e numele ca se refera la un operatr unu singur unary
     token_type op;      // operator pentru -
-    Node* child;  // se aplica la exrepresia asta 
+    ExprNode* child;  // se aplica la exrepresia asta 
     // Constructor: initializeaza child si op
-    UnaryNode(token_type o, Node* c) : op(o), child(c){};
+    UnaryNode(token_type o, ExprNode* c) : op(o), child(c){};
 };
-struct BinaryNode:Node{
+struct BinaryNode:ExprNode{
     token_type op;
-    Node* left;
-    Node* right;
-    BinaryNode(token_type o,Node* a,Node* b) : op(o),  left(a),right(b){};
+    ExprNode* left;
+    ExprNode* right;
+    BinaryNode(token_type o,ExprNode* a,ExprNode* b) : op(o),  left(a),right(b){};
 };
+struct DeclarNode:Node{
+    VariableNode* var;
+    ExprNode* expr;
+    DeclarNode(VariableNode* v, ExprNode* e) : var(v), expr(e){}
+
+};
+struct LineNode:Node{
+enum LineType{DECLAR,EXPR};
+LineType type;
+Node* line;
+LineNode(LineType t, Node* s ) : type(t),line(s){};
+};
+
 
 
 // clasa de parser a trebuit sa o mut sper sa mearga plsplsplspls

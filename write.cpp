@@ -3,6 +3,8 @@
 #include "lexer.hpp"
 #include "write.hpp"
 
+std::ofstream file_output ("test.asm");
+
 char tokenTypeToChar(token_type i) {
     switch(i) {
         case PLUS: return '+';
@@ -35,11 +37,13 @@ void printTree(Node* node, int i) {
 }
 /////////////////////////////////////////////////////       T        E      S       T       E       //////////////////////////////////////////////
 
-void write_in_file(Node* node) {
+
+void write_in_file_recursive(Node* node) {
     if (!node) return;
 
     if (auto n = dynamic_cast<NumberNode*>(node)) {  
     std::cout << "    mov rax, " << n->value << "\n";
+    file_output << "    mov rax, " << n->value << "\n";
     }
    /* else if (auto v = dynamic_cast<VariableNode*>(node)) {               
        
@@ -49,29 +53,47 @@ void write_in_file(Node* node) {
     }
     */
     else if (auto b = dynamic_cast<BinaryNode*>(node)) {
-        write_in_file(b->left);
+        
+        write_in_file_recursive(b->left);
         std::cout << "    push rax\n";
-        write_in_file(b->right);
+        write_in_file_recursive(b->right);
         std::cout << "    pop rbx\n";//scoti din rbx
 
         // combini cele 2 
         switch (b->op) {
             case PLUS: 
                 std::cout << "    add rax, rbx\n"; 
+                file_output << "    add rax, rbx\n"; 
                 break;
             case MINUS: 
                 std::cout << "    sub rbx, rax\n"; 
                 std::cout << "    mov rax, rbx\n"; 
+                file_output<< "    sub rbx, rax\n"; 
+                file_output<< "    mov rax, rbx\n"; 
                 break;
             case TIMES: 
                 std::cout << "    imul rax, rbx\n"; 
+                file_output << "    imul rax, rbx\n";
                 break;
             case SLASH: 
                 std::cout << "    mov rdx, 0\n";    // clear RDX for division
                 std::cout << "    mov rcx, rax\n";  // divisor
                 std::cout << "    mov rax, rbx\n";  // dividend
                 std::cout << "    idiv rcx\n";     // RAX = RAX / RCX
+                file_output << "    mov rdx, 0\n";    // clear RDX for division
+                file_output<< "    mov rcx, rax\n";  // divisor
+                file_output << "    mov rax, rbx\n";  // dividend
+                file_output << "    idiv rcx\n";     // RAX = RAX / RCX
                 break;
         }
     }
+}
+void write_in_file(Node* node){
+    
+
+
+    file_output<<"section .text\n"<<"global _start\n\n"<<"_start:\n";
+    write_in_file_recursive(node);
+    file_output<<"mov rdi, rax\n"<<"mov rax, 60\n"<<"syscall";
+
 }

@@ -1,2 +1,3 @@
 *.o
 compiler5
+lexer.o

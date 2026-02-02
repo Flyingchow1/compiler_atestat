@@ -11,10 +11,12 @@ char tokenTypeToChar(token_type i) {
         case MINUS: return '-';
         case TIMES: return '*';
         case SLASH: return '/';
+        case EQUAL: return '=';
         
         default: return '?';
     }
 }
+/*
 void printTree(Node* node, int i) {
     if (!node) return; // daca 
 
@@ -34,7 +36,51 @@ void printTree(Node* node, int i) {
         printTree(b->left, i + 1);
         printTree(b->right, i + 1);
     }
+}*/
+void printTree(Node* node, int depth = 0) {
+    if (!node) return;
+    std::string padding(depth * 4, '_'); // 4 underscores per depth level
+    if (auto n = dynamic_cast<NumberNode*>(node)) {
+        std::cout << padding << "NUMBER " << n->value << "\n";
+    }
+    else if (auto v = dynamic_cast<VariableNode*>(node)) {
+        std::cout << padding << "VARIABLE " << v->name << "\n";
+    }
+    else if (auto u = dynamic_cast<UnaryNode*>(node)) {
+        std::cout << padding << "UNARY " << tokenTypeToChar(u->op) << "\n";
+        printTree(u->child, depth + 1);
+    }
+    else if (auto b = dynamic_cast<BinaryNode*>(node)) {
+        std::cout << padding << "BINARY " << tokenTypeToChar(b->op) << "\n";
+        printTree(b->left, depth + 1);
+        printTree(b->right, depth + 1);
+    }
+    else if (auto d = dynamic_cast<DeclarNode*>(node)) {
+        std::cout << padding << "DECLARATION\n";
+        printTree(d->var, depth + 1);
+        printTree(d->expr, depth + 1);
+    }
+    else if (auto e = dynamic_cast<EchoNode*>(node)) {
+        std::cout << padding << "ECHO\n";
+        printTree(e->expr, depth + 1);
+    }
+    else if (auto l = dynamic_cast<LineNode*>(node)) {
+        std::cout << padding << "LINE " 
+                  << (l->type == DECLAR ? "DECLAR" : "ECHO") 
+                  << "\n";
+        printTree(l->line, depth + 1);
+    }
+    else if (auto p = dynamic_cast<ProgramNode*>(node)) {
+        std::cout << padding << "PROGRAM\n";
+        for (auto line : p->lines)
+            printTree(line, depth + 1);
+    }
+    else {
+        std::cout << padding << "UNKNOWN NODE\n";
+    }
 }
+
+
 /////////////////////////////////////////////////////       T        E      S       T       E       //////////////////////////////////////////////
 
 

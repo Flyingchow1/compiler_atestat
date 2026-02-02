@@ -50,8 +50,14 @@ token Lexer::identifier(){
 
 token Lexer::getToken(){
     skip_white_space();
-    if(isalpha(current))
-        return identifier();
+    if(isalpha(current)){
+        token id=identifier();
+        if(id.value == "echo"){
+            id.type=ECHO;
+            return id;
+        }
+        return id;
+    }
     else if(isdigit(current))
             return number();
     else if(current=='+'){
@@ -110,6 +116,13 @@ token Lexer::getToken(){
         result.value = "";
         return result;
     }
+    else if(current=='='){
+        token result;
+        result.type=EQUAL;
+        result.value = std::string(1, current);
+        advance();
+        return result;
+    }
     else{
     std::cerr << "Lexer error: unexpected character '" << current << "'" << std::endl;
     advance();
@@ -127,6 +140,8 @@ std::string Lexer::token_to_string(token_type type){
     else if(type == 7) return "TIMES";
     else if(type == 8) return "EOF";
     else if(type == 9) return "EOL";
+    else if(type == 10) return "ECHO";
+    else if(type == 11) return "EQUAL";
     else {
         std::cerr << "eroare???"<<type<<std::endl;
         return "END_OF_FILE";

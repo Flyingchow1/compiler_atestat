@@ -12,7 +12,9 @@ enum token_type{
     RPAR,
     TIMES,
     END_OF_FILE,
-    END_OF_LINE
+    END_OF_LINE,
+    ECHO,
+    EQUAL
 };
 struct token {
     token_type type;

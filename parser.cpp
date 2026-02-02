@@ -16,14 +16,19 @@ token Parser::peek(){
     return tokens[current];
 }
 
-bool Parser::is_end(){
+bool Parser::is_end_of_file(){
     if ( peek().type==END_OF_FILE)
+        return true;
+    return false;
+}
+bool Parser::is_end_of_line(){
+    if ( peek().type==END_OF_LINE)
         return true;
     return false;
 }
 
 token Parser::advance(){
-    if(!is_end()){
+    if(!is_end_of_file()){
         token old_token=tokens[current];
         current++;
         return old_token;
@@ -33,6 +38,12 @@ token Parser::advance(){
 bool Parser::is_match(token_type type){// IS MATCH SI AVANSEAZA SINGUR
     if(peek().type==type) {
         advance();
+        return true;
+    }
+    return false;
+}
+bool Parser::check(token_type type){
+    if(peek().type==type){
         return true;
     }
     return false;
@@ -83,10 +94,62 @@ factor → NUMBER| IDENT| "(" expr ")"| "-" factor
 
 ///ACTUAL PARSING
 
-Node* Parser::factor(){
+ProgramNode* Parser::program() {
+    ProgramNode* prog = new ProgramNode();
+
+    while (!is_end_of_file()) {
+        if (is_match(ID)) {
+            // parse a declaration
+            DeclarNode* decl = declar();
+            LineNode* ln = new LineNode(DECLAR, decl);
+            prog->lines.push_back(ln);
+        }
+        else if (is_match(ECHO)) {
+            EchoNode* node = echo(); 
+            LineNode* ln = new LineNode(ECHO1, node);
+            prog->lines.push_back(ln);
+        }
+        else if (is_match(END_OF_LINE)){
+
+        }
+        else {
+            std::cout << "EROARE PROGRAM()\n";
+            std::cout<< "poate ai uitat punct si virgua ;\n";
+            std::cout<<"current este in program       "<<current<<"        "<<tokens[current].type<<"\n";
+            return nullptr;
+
+            //advance();
+        }
+    }
+    return prog;
+};
+DeclarNode* Parser::declar(){
+    token tok =previous();
+    std::string value=tok.value;
+    VariableNode* var = new VariableNode(value);
+    if(is_match(EQUAL)){
+        //pt ca cand am scris expr() am acolo un  rpevious
+        //std::cout<<"current este in declar parser inainte de expr      "<<current<<"        "<<tokens[current].type<<"\n";
+        ExprNode* equal2 = expr();
+        //std::cout<<"current este in declar parser dupa expr funct     "<<current<<"        "<<tokens[current].type<<"\n";
+        return new DeclarNode(var,equal2);
+    }
+    else {
+        //std::cout<<"current este in declar parser dupa expr funct     "<<current<<"        "<<tokens[current].type<<"\n";
+        std::cout<<"expected =, eroare declaratie \n";
+        return nullptr;
+    }
+};
+EchoNode* Parser::echo(){
+    ExprNode* node=expr();
+    return new EchoNode(node);
+};
+
+
+ExprNode* Parser::factor(){
     if(is_match(MINUS)){ //match si treci mai departe
         std::cout << "UNARY MINUS DETECTED\n";
-        Node* child = factor(); // dai parse la urmatoru factor de vine
+        ExprNode* child = factor(); // dai parse la urmatoru factor de vine
         return new UnaryNode(MINUS,child); //il transformi in UnaryNode 
     }
     else if(is_match(NUM)){
@@ -100,7 +163,7 @@ Node* Parser::factor(){
         return new VariableNode(value);
     }
     else if(is_match(LPAR)){
-        Node* inside=expr();
+        ExprNode* inside=expr();
         consume(RPAR);// OBLIG sa fie )
         return inside;
     }
@@ -113,27 +176,25 @@ Node* Parser::factor(){
 }
 
 
-Node* Parser::term(){
-    Node* left=factor();
+ExprNode* Parser::term(){
+    ExprNode* left=factor();
     while( is_match(TIMES) || is_match(SLASH)){
         token op=previous();
-        Node* right =factor();
+        ExprNode* right =factor();
         left=new BinaryNode(op.type ,left ,right);// am stat 2 ore sa imi dau seama caaveam oridnea gresita(left op right )
     }
     return left;
     }
 
-Node* Parser::expr(){
-    Node* left=term();
+ExprNode* Parser::expr(){
+    ExprNode* left=term();
     while(is_match(PLUS) || is_match(MINUS)){
         token op=previous();
-        Node* right= term();
+        ExprNode* right= term();
         left= new BinaryNode( op.type , left , right);
     }
     return left;
-
-
-    
-
 }
+
+
 

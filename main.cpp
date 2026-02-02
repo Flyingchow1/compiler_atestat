@@ -1,7 +1,7 @@
 #include <iostream>
 #include "parser.hpp"
 #include "lexer.hpp"
-#include "write.hpp"florin
+#include "write.hpp"
 
 
 
@@ -27,7 +27,7 @@ std::cout<<"test\n";// TEMP
     //VERIFIC PARSE TREE U
     std::cout<<"\n\n\n\n\n\n    PARSER TEST:\n";       // TEMP
     Parser parser(tokens);
-    Node* root=parser.expr();
+    ProgramNode* root=parser.program();
     printTree(root,0);
     
     //SCRIU IN FISIER/'CONSOLA ASEMBLY
@@ -35,7 +35,7 @@ std::cout<<"test\n";// TEMP
     std::cout<<"FILE TEST\n\n";    
     
 
-    write_in_file(root);
+    //write_in_file(root);
     
 
 }

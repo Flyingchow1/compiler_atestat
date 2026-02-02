@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "lexer.hpp"
+enum LineType{DECLAR,ECHO1};
 
 struct Node {
     virtual ~Node() = default;//virtual ca sa se stearga calumea node urile
@@ -9,6 +10,7 @@ struct ExprNode:Node{
     virtual ~ExprNode()=default;
 
 };
+
 
 struct NumberNode:ExprNode {
     int value;                // the numeric value
@@ -36,31 +38,46 @@ struct BinaryNode:ExprNode{
     ExprNode* right;
     BinaryNode(token_type o,ExprNode* a,ExprNode* b) : op(o),  left(a),right(b){};
 };
-struct DeclarNode:Node{
+struct DeclarNode:Node{////////
     VariableNode* var;
     ExprNode* expr;
-    DeclarNode(VariableNode* v, ExprNode* e) : var(v), expr(e){}
+    DeclarNode(VariableNode* v, ExprNode* e) : var(v), expr(e){};
 
 };
-struct LineNode:Node{
-enum LineType{DECLAR,EXPR};
+struct EchoNode:Node{/////////
+    ExprNode* expr;
+    EchoNode(ExprNode* v) : expr(v){};
+};
+struct LineNode:Node{////////
+
 LineType type;
 Node* line;
 LineNode(LineType t, Node* s ) : type(t),line(s){};
 };
+struct ProgramNode:Node{
+    std::vector<LineNode*> lines;
 
+    ~ProgramNode(){                 
+        for(LineNode* line: lines)
+            delete line ;
+    };
+};
 
 
 // clasa de parser a trebuit sa o mut sper sa mearga plsplsplspls
 class Parser{
 public:
+    std::vector <ExprNode*> childs;
     Parser(const std::vector<token>& tokens);
     void parse();
-    Node* expr();
-    Node* term();
-    Node* factor();
-
+    ExprNode* expr();
+    ExprNode* term();
+    ExprNode* factor();
+    DeclarNode* declar();
+    ProgramNode* program();
+    EchoNode* echo();
 private:
+    
     std::vector<token> tokens;
     size_t current;
 
@@ -68,7 +85,9 @@ private:
     token advance();
     bool is_match(token_type type);
     token previous();
-    bool is_end();
+    bool is_end_of_file();
+    bool is_end_of_line();
+    bool check(token_type type);
 
     token consume(token_type type);
 

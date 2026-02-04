@@ -35,7 +35,7 @@ std::cout<<"test\n";// TEMP
     std::cout<<"FILE TEST\n\n";    
     
 
-    //write_in_file(root);
+    write_in_file(root);
     
 
 }
